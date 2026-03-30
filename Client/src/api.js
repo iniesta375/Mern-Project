@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'http://127.0.0.1:5000/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
@@ -8,87 +8,148 @@ const getHeaders = () => {
   };
 };
 
+const handleResponse = async (res) => {
+  if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    throw new Error(`Request failed: ${res.status}`);
+  }
+  return res.json();
+};
+
 export const api = {
+
   auth: {
     login: async (data) => {
-      console.log('Fetching:', `${API_BASE}/auth/login`);
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Login failed');
-      return res.json();
+      return handleResponse(res);
     },
+
     register: async (data) => {
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Registration failed');
-      return res.json();
+      return handleResponse(res);
     },
+
     me: async () => {
-      const res = await fetch(`${API_BASE}/auth/me`, { headers: getHeaders() });
-      if (!res.ok) throw new Error('Failed to fetch user');
-      return res.json();
+      const res = await fetch(`${API_BASE}/auth/me`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
+    },
+
+    updateProfile: async (data) => {
+      const res = await fetch(`${API_BASE}/auth/profile`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      return handleResponse(res);
+    },
+
+    updatePreferences: async (data) => {
+      const res = await fetch(`${API_BASE}/auth/preferences`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      return handleResponse(res);
+    },
+
+    deleteAccount: async () => {
+      const res = await fetch(`${API_BASE}/auth/account`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
   },
+
   medications: {
     list: async () => {
-      const res = await fetch(`${API_BASE}/medications`, { headers: getHeaders() });
-      return res.json();
+      const res = await fetch(`${API_BASE}/medications`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
+
     create: async (data) => {
       const res = await fetch(`${API_BASE}/medications`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(data),
       });
-      return res.json();
+      return handleResponse(res);
     },
+
     delete: async (id) => {
-      await fetch(`${API_BASE}/medications/${id}`, {
+      const res = await fetch(`${API_BASE}/medications/${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
+      return handleResponse(res);
     },
   },
+
   adherence: {
     today: async () => {
-      const res = await fetch(`${API_BASE}/adherence/today`, { headers: getHeaders() });
-      return res.json();
+      const res = await fetch(`${API_BASE}/adherence/today`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
+
     log: async (data) => {
-      await fetch(`${API_BASE}/adherence/log`, {
+      const res = await fetch(`${API_BASE}/adherence/log`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(data),
       });
+      return handleResponse(res);
     },
+
     stats: async () => {
-      const res = await fetch(`${API_BASE}/adherence/stats`, { headers: getHeaders() });
-      return res.json();
+      const res = await fetch(`${API_BASE}/adherence/stats`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
   },
+
   wellness: {
     logs: async () => {
-      const res = await fetch(`${API_BASE}/wellness/logs`, { headers: getHeaders() });
-      return res.json();
+      const res = await fetch(`${API_BASE}/wellness/logs`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
+
     log: async (data) => {
-      await fetch(`${API_BASE}/wellness/log`, {
+      const res = await fetch(`${API_BASE}/wellness/log`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(data),
       });
+      return handleResponse(res);
     },
   },
+
   reports: {
     summary: async () => {
-      const res = await fetch(`${API_BASE}/reports/summary`, { headers: getHeaders() });
-      return res.json();
+      const res = await fetch(`${API_BASE}/reports/summary`, {
+        headers: getHeaders(),
+      });
+      return handleResponse(res);
     },
   },
+
 };

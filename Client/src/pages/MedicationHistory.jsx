@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-// import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Pill, ShieldCheck, Heart, BarChart3, ChevronRight } from 'lucide-react';
 import { LogoWithText } from '../components/Logo';
 

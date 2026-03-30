@@ -1,14 +1,16 @@
-const mongoose = require('mongoose')
-require('dotenv').config()
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mediwell';
 
-export const connectDB = async () => {
+const connectDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+    await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
   } catch (err) {
     console.error('MongoDB connection error:', err);
-    console.log('Server will continue without DB (API calls will fail)');
+    process.exit(1); 
   }
 };
+
+module.exports = { connectDB };

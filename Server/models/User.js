@@ -5,6 +5,11 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: String,
+  preferences: {
+  pushNotifications: { type: Boolean, default: true },
+  caregiverAlerts:   { type: Boolean, default: false },
+  weeklySummary:     { type: Boolean, default: true },
+},
   createdAt: { type: Date, default: Date.now }
 });
 

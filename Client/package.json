@@ -15,7 +15,7 @@
     "bootstrap": "^5.3.8",
     "data-fns": "^1.1.0",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.34.3",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.575.0",
     "mongoose": "^9.2.2",
     "prop-types": "^15.8.1",

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Pill, Clock, Calendar, Plus, X, ArrowLeft, Save } from 'lucide-react';
 import { api } from '../api';
 
