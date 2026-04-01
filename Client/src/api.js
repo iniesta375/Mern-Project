@@ -14,7 +14,8 @@ const handleResponse = async (res) => {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
-    throw new Error(`Request failed: ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Request failed: ${res.status}`);
   }
   return res.json();
 };

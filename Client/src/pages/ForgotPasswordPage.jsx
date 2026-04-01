@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
       await api.auth.forgotPassword({ email });
       setSent(true);
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
               </div>
               <h2 className="fw-bold text-dark mb-1">Forgot your password?</h2>
               <p className="text-secondary mb-0">
-                Enter your email and we'll send you a reset link.
+                Enter your email and we&apos;ll send you a reset link.
               </p>
             </div>
 
@@ -71,8 +71,8 @@ export default function ForgotPasswordPage() {
                 </div>
                 <h5 className="fw-bold text-dark mb-2">Check your inbox</h5>
                 <p className="text-secondary small mb-4">
-                  If <strong>{email}</strong> is registered with MediWell, you'll receive
-                  a reset link shortly. Check your spam folder if you don't see it.
+                  If <strong>{email}</strong> is registered with MediWell, you&apos;ll receive
+                  a reset link shortly. Check your spam folder if you don&apos;t see it.
                 </p>
                 <Link
                   to="/login"
@@ -138,3 +138,4 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+

@@ -19,6 +19,31 @@ const upload = multer({
   },
 });
 
+router.get('/test-email', async (req, res) => {
+  const nodemailer = require('nodemailer');
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+  try {
+    const info = await transporter.sendMail({
+      from: `"MediWell Test" <${process.env.GMAIL_USER}>`,
+      to: 'ajayiinioluwa2007@gmail.com',
+      subject: 'MediWell Test Email',
+      text: 'If you got this, nodemailer is working correctly.',
+    });
+    res.json({ success: true, messageId: info.messageId, response: info.response });
+  } catch (err) {
+    res.json({ success: false, error: err.message, code: err.code });
+  }
+});
+
+
 router.post('/auth/register',         authController.register);
 router.post('/auth/login',            authController.login);
 router.post('/auth/google',           authController.googleLogin);

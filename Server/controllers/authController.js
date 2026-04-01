@@ -13,12 +13,15 @@ cloudinary.config({
 });
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host:   'smtp.gmail.com',
+  port:   465,
+  secure: true,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
+
 
 const makeToken = (user) =>
   jwt.sign(
@@ -49,6 +52,12 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+    if (!user.password) {
+      return res.status(400).json({
+        error: 'This account uses Google Sign-In. Please use the Google button to sign in.',
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
@@ -189,18 +198,19 @@ const deleteAccount = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
+
   const { email } = req.body;
 
-  if (!email) return res.status(400).json({ error: 'Email is required.' });
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
-      return res.json({ message: 'If that email exists, a reset link has been sent.' });
-    }
-
-    if (user.googleId && !user.password) {
       return res.json({ message: 'If that email exists, a reset link has been sent.' });
     }
 
@@ -213,9 +223,6 @@ const forgotPassword = async (req, res) => {
 
     const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
     const resetURL  = `${clientURL}/reset-password?token=${token}`;
-
-    console.log('📨 Attempting to send reset email to:', user.email);
-    console.log('🔗 Reset URL:', resetURL);
 
     const info = await transporter.sendMail({
       from:    `"MediWell" <${process.env.GMAIL_USER}>`,
@@ -237,7 +244,7 @@ const forgotPassword = async (req, res) => {
             Reset Password
           </a>
           <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:0;">
-            This link expires in <strong>1 hour</strong>. If you didn't request a password reset,
+            This link expires in <strong>1 hour</strong>. If you didn&apos;t request a password reset,
             you can safely ignore this email — your account is secure.
           </p>
           <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
@@ -248,12 +255,10 @@ const forgotPassword = async (req, res) => {
       `,
     });
 
-    console.log('✅ Email sent successfully! Message ID:', info.messageId);
     res.json({ message: 'If that email exists, a reset link has been sent.' });
 
   } catch (error) {
     console.error('❌ FORGOT PASSWORD ERROR:', error.message);
-    console.error('Full error:', error);
     res.status(500).json({ error: 'Server error. Please try again.' });
   }
 };
@@ -271,11 +276,9 @@ const resetPassword = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      
       resetPasswordToken:   token,
       resetPasswordExpires: { $gt: new Date() },
     });
-    console.log('🔍 Lookup:', email, '→', user ? 'FOUND' : 'NOT FOUND');
 
     if (!user) {
       return res.status(400).json({ error: 'Reset link is invalid or has expired.' });
@@ -286,6 +289,7 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpires = null;
     await user.save();
 
+    console.log('✅ Password reset for:', user.email);
     res.json({ message: 'Password reset successfully. You can now log in.' });
 
   } catch (error) {
