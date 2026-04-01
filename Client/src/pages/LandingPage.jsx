@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { LogoWithText } from '../components/Logo';
 
-/* ── Reusable fade-in-up on scroll ─────────────────────────────── */
 function FadeUp({ children, delay = 0, className = '' }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
@@ -25,7 +24,6 @@ function FadeUp({ children, delay = 0, className = '' }) {
   );
 }
 
-/* ── Animated counter ───────────────────────────────────────────── */
 function StatCard({ value, label, suffix = '' }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
@@ -44,7 +42,6 @@ function StatCard({ value, label, suffix = '' }) {
   );
 }
 
-/* ── Data ───────────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: Bell,
@@ -207,7 +204,7 @@ export default function LandingPage() {
                         <Pill size={16} className="text-white" />
                       </div>
                       <div>
-                        <p className="fw-bold text-dark mb-0 small">Good morning, Adaeze 👋</p>
+                        <p className="fw-bold text-dark mb-0 small">Good morning, Adaeze!</p>
                         <p className="text-secondary mb-0" style={{ fontSize: '11px' }}>3 doses scheduled today</p>
                       </div>
                     </div>
@@ -245,7 +242,6 @@ export default function LandingPage() {
                       </motion.div>
                     ))}
 
-                    {/* Mini adherence bar */}
                     <div className="mt-3 p-3 rounded-3 border" style={{ background: '#f8fafc' }}>
                       <div className="d-flex justify-content-between small mb-2">
                         <span className="text-secondary fw-bold">Weekly adherence</span>

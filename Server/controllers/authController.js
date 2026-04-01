@@ -214,7 +214,10 @@ const forgotPassword = async (req, res) => {
     const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
     const resetURL  = `${clientURL}/reset-password?token=${token}`;
 
-    await transporter.sendMail({
+    console.log('📨 Attempting to send reset email to:', user.email);
+    console.log('🔗 Reset URL:', resetURL);
+
+    const info = await transporter.sendMail({
       from:    `"MediWell" <${process.env.GMAIL_USER}>`,
       to:      user.email,
       subject: 'Reset your MediWell password',
@@ -245,10 +248,12 @@ const forgotPassword = async (req, res) => {
       `,
     });
 
+    console.log('✅ Email sent successfully! Message ID:', info.messageId);
     res.json({ message: 'If that email exists, a reset link has been sent.' });
 
   } catch (error) {
-    console.error('FORGOT PASSWORD ERROR:', error);
+    console.error('❌ FORGOT PASSWORD ERROR:', error.message);
+    console.error('Full error:', error);
     res.status(500).json({ error: 'Server error. Please try again.' });
   }
 };
@@ -266,9 +271,11 @@ const resetPassword = async (req, res) => {
 
   try {
     const user = await User.findOne({
+      
       resetPasswordToken:   token,
       resetPasswordExpires: { $gt: new Date() },
     });
+    console.log('🔍 Lookup:', email, '→', user ? 'FOUND' : 'NOT FOUND');
 
     if (!user) {
       return res.status(400).json({ error: 'Reset link is invalid or has expired.' });
@@ -287,4 +294,15 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, googleLogin, me, updateProfile, updatePreferences, uploadAvatar, deleteAccount, forgotPassword, resetPassword,};
+module.exports = {
+  register,
+  login,
+  googleLogin,
+  me,
+  updateProfile,
+  updatePreferences,
+  uploadAvatar,
+  deleteAccount,
+  forgotPassword,
+  resetPassword,
+};
