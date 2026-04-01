@@ -4,7 +4,21 @@ const medicationSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true,trim: true },
   dosage: { type: String, required: true },
-  frequency: { type: String, enum: ['daily', 'weekly', 'as_needed'], default: 'daily',required: true},
+ frequency: {
+  type: String,
+  required: true,
+  enum: [
+    'once daily',
+    'twice daily',
+    'thrice daily',
+    'four times daily',  
+    'every 4 hours',
+    'every 6 hours',
+    'every 8 hours',
+    'weekly',
+    'as needed',
+  ],
+},
 
   times: [{type: String }],
   startDate: {type: Date, required: true },

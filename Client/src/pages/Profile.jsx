@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import {
   User as UserIcon,
   Mail,
@@ -21,26 +21,27 @@ import { useToast } from '../context/ToastContext';
 import { SkeletonLine, SkeletonCard } from '../components/Skeleton';
 
 export default function Profile() {
-  const { user, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef(null);
+
+  const [profileData, setProfileData]         = useState(null);
+  const [loading, setLoading]                 = useState(true);
+
+  const [avatarPreview, setAvatarPreview]     = useState(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm] = useState({ fullName: '', phone: '' });
-  const [editLoading, setEditLoading] = useState(false);
+  const [editForm, setEditForm]           = useState({ fullName: '', phone: '' });
+  const [editLoading, setEditLoading]     = useState(false);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal]     = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading]         = useState(false);
 
-  const [prefs, setPrefs] = useState({
-    pushNotifications: true,
-    caregiverAlerts: false,
-    weeklySummary: true,
-  });
+  const [prefs, setPrefs]           = useState({ pushNotifications: true, caregiverAlerts: false, weeklySummary: true });
   const [savingPref, setSavingPref] = useState(null);
 
   useEffect(() => {
@@ -58,6 +59,40 @@ export default function Profile() {
     };
     fetchUser();
   }, []);
+
+  const handleAvatarClick = () => {
+    if (!avatarUploading) fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image must be under 5MB.', 'error');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select an image file.', 'error');
+      return;
+    }
+
+    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarUploading(true);
+
+    try {
+      const { avatarUrl } = await api.auth.uploadAvatar(file);
+      setProfileData(prev => ({ ...prev, avatarUrl }));
+      setAvatarPreview(null);
+      showToast('Profile picture updated!', 'success');
+    } catch (err) {
+      setAvatarPreview(null);
+      showToast('Failed to upload picture. Please try again.', 'error');
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
+    }
+  };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +117,7 @@ export default function Profile() {
       await api.auth.updatePreferences(updated);
       showToast('Preference saved.', 'success');
     } catch (err) {
-      setPrefs(prefs); 
+      setPrefs(prefs);
       showToast('Failed to save preference.', 'error');
     } finally {
       setSavingPref(null);
@@ -114,17 +149,19 @@ export default function Profile() {
           <div className="flex-grow-1">
             <SkeletonLine width="50%" height="24px" className="mb-2" />
             <SkeletonLine width="35%" height="16px" className="mb-3" />
-            <SkeletonLine width="200px" height="32px" className="rounded-3" />
+            <SkeletonLine width="200px" height="36px" className="rounded-3" />
           </div>
         </div>
       </SkeletonCard>
     </div>
   );
 
+  const displayAvatar = avatarPreview || profileData?.avatarUrl;
+
   const PREFERENCES = [
-    { key: 'pushNotifications', label: 'Push Notifications', desc: 'Get reminders on your device',       icon: Bell },
-    { key: 'caregiverAlerts',   label: 'Caregiver Alerts',   desc: 'Notify others if you miss a dose',   icon: Shield },
-    { key: 'weeklySummary',     label: 'Weekly Summary',     desc: 'Receive email health reports',        icon: Settings },
+    { key: 'pushNotifications', label: 'Email Reminders',  desc: 'Get dose reminders via email',        icon: Bell    },
+    { key: 'caregiverAlerts',   label: 'Caregiver Alerts', desc: 'Notify others if you miss a dose',    icon: Shield  },
+    { key: 'weeklySummary',     label: 'Weekly Summary',   desc: 'Receive weekly email health reports', icon: Settings },
   ];
 
   return (
@@ -139,17 +176,60 @@ export default function Profile() {
 
         <section className="card border-0 shadow-sm p-4 p-md-5">
           <div className="row g-4 align-items-center">
+
             <div className="col-auto">
-              <div className="position-relative">
+              <div className="position-relative" style={{ width: '120px' }}>
+
                 <div
-                  className="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center border border-4 border-white shadow"
-                  style={{ width: '120px', height: '120px' }}
+                  className="rounded-circle border border-4 border-white shadow"
+                  style={{ width: '120px', height: '120px', background: '#f0fdf4', overflow: 'hidden' }}
                 >
-                  <UserIcon className="text-success" size={60} />
+                  {displayAvatar ? (
+                    <img
+                      src={displayAvatar}
+                      alt="Profile"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                      <UserIcon className="text-success" size={60} />
+                    </div>
+                  )}
                 </div>
-                <button className="btn btn-white btn-sm rounded-circle shadow-sm border position-absolute bottom-0 end-0 p-2">
-                  <Camera size={18} className="text-secondary" />
+
+                {avatarUploading && (
+                  <div
+                    className="position-absolute top-0 start-0 rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: '120px', height: '120px', background: 'rgba(0,0,0,0.5)', zIndex: 2 }}
+                  >
+                    <span className="spinner-border text-white" />
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleAvatarClick}
+                  disabled={avatarUploading}
+                  className="btn btn-success btn-sm rounded-circle shadow position-absolute d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '36px', height: '36px',
+                    border: '2px solid white',
+                    bottom: '0', right: '0',
+                    zIndex: 3,
+                  }}
+                  title="Change profile picture"
+                >
+                  <Camera size={16} className="text-white" />
                 </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarChange}
+                  style={{ display: 'none' }}
+                />
+
               </div>
             </div>
 
@@ -160,9 +240,14 @@ export default function Profile() {
                 <span className="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 small border border-success border-opacity-25">
                   Active Member
                 </span>
-                <span className="badge rounded-pill bg-light text-secondary px-3 py-2 small border">
-                  MediWell User
-                </span>
+                {profileData?.googleId && (
+                  <span className="badge rounded-pill bg-light text-secondary px-3 py-2 small border d-flex align-items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 48 48">
+                      <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/>
+                    </svg>
+                    Google Account
+                  </span>
+                )}
               </div>
             </div>
 
@@ -191,7 +276,7 @@ export default function Profile() {
                 {[
                   { icon: Mail,  label: 'Email Address', value: profileData?.email },
                   { icon: Phone, label: 'Phone Number',  value: profileData?.phone || 'Not provided' },
-                  { icon: Lock,  label: 'Password',      value: '••••••••••••' },
+                  { icon: Lock,  label: 'Password',      value: profileData?.googleId ? 'Managed by Google' : '••••••••••••' },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="d-flex align-items-center gap-3">
                     <div
@@ -289,10 +374,7 @@ export default function Profile() {
             >
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <h5 className="fw-bold text-dark mb-0">Edit Profile</h5>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="btn btn-light btn-sm rounded-circle p-1"
-                >
+                <button onClick={() => setShowEditModal(false)} className="btn btn-light btn-sm rounded-circle p-1">
                   <X size={18} />
                 </button>
               </div>
@@ -332,11 +414,7 @@ export default function Profile() {
                 </div>
 
                 <div className="d-flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="btn btn-light fw-bold px-4 py-2 rounded-3 flex-grow-1"
-                  >
+                  <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-light fw-bold px-4 py-2 rounded-3 flex-grow-1">
                     Cancel
                   </button>
                   <button
@@ -355,13 +433,12 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
-    
       <AnimatePresence>
         {showDeleteModal && (
           <div
             className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
             style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1055 }}
-            onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteModal(false); }}
+            onClick={(e) => { if (e.target === e.currentTarget) { setShowDeleteModal(false); setDeleteConfirmText(''); } }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}

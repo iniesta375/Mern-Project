@@ -129,14 +129,14 @@ export default function Reports() {
               and mental state over time.
             </p>
             <div className="d-flex flex-wrap gap-3">
-              <button className="btn btn-light btn-lg px-4 fw-bold text-dark rounded-3 d-flex align-items-center gap-2">
+              {/* <button className="btn btn-light btn-lg px-4 fw-bold text-dark rounded-3 d-flex align-items-center gap-2">
                 <Share2 size={20} />
                 Share Access
               </button>
               <button className="btn btn-outline-light btn-lg px-4 fw-bold rounded-3 d-flex align-items-center gap-2">
                 <FileText size={20} />
                 View Full History
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

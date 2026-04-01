@@ -72,7 +72,29 @@ export const api = {
       });
       return handleResponse(res);
     },
+        googleLogin: async ({ idToken }) => {
+      const res = await fetch(`${API_BASE}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      return handleResponse(res);
+    },
+
+    uploadAvatar: async (file) => {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await fetch(`${API_BASE}/auth/avatar`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      return handleResponse(res);
+    },
   },
+
+
 
   medications: {
     list: async () => {

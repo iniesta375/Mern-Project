@@ -2,7 +2,6 @@ const Medication = require('../models/Medication.js');
 
 const list = async (req, res) => {
   try {
-    // Safety check for middleware
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
@@ -19,7 +18,7 @@ const list = async (req, res) => {
       end_date: m.endDate
     })));
   } catch (error) {
-    console.error("LIST ERROR:", error); // Check terminal for this!
+    console.error("LIST ERROR:", error);
     res.status(500).json({ error: 'Server error fetching medications' });
   }
 };
@@ -28,7 +27,6 @@ const create = async (req, res) => {
   const { name, dosage, frequency, times, startDate, endDate } = req.body;
   
   try {
-    // 1. Validate Date Inputs
     const parsedStartDate = new Date(startDate);
     if (isNaN(parsedStartDate.getTime())) {
       return res.status(400).json({ error: 'Invalid Start Date provided' });
@@ -42,12 +40,11 @@ const create = async (req, res) => {
       times,
       startDate: parsedStartDate,
       endDate: endDate ? new Date(endDate) : null,
-      active: true // Ensure new meds are active by default
+      active: true 
     });
 
     await medication.save();
     
-    // Return the saved object so frontend can update state immediately
     res.json({ 
       id: medication._id, 
       name: medication.name, 
@@ -68,7 +65,7 @@ const remove = async (req, res) => {
     const result = await Medication.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id }, 
       { active: false },
-      { new: true } // returns the updated document
+      { new: true } 
     );
 
     if (!result) return res.status(404).json({ error: 'Medication not found' });
