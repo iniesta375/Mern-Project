@@ -11,9 +11,19 @@ const app  = express();
 const PORT = process.env.PORT || 5000;
 
 const serviceAccount = require('./serviceAccountKey.json');
+let serviceAccount;
+
+if (process.env.NODE_ENV === 'production') {
+  serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+} else {
+  serviceAccount = require('./serviceAccountKey.json');
+}
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccount)
 });
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 console.log('Firebase Admin initialised');
 
 app.use(cors({
