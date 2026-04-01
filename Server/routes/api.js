@@ -41,6 +41,8 @@ router.post('/wellness/log',      authenticateToken, wellnessController.log);
 
 router.get('/reports/summary',    authenticateToken, reportController.getSummary);
 
+
+
 router.post('/notifications/send-reminders', authenticateToken, notificationController.sendReminders);
 
 module.exports = router;

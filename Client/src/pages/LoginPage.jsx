@@ -134,9 +134,10 @@ export default function LoginPage() {
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <label className="form-label small fw-bold text-secondary mb-0">Password</label>
-                  <Link to="#" className="text-success text-decoration-none small fw-bold">
+                  <Link to="/forgot-password" className="text-success text-decoration-none small fw-bold">
                     Forgot password?
                   </Link>
+
                 </div>
                 <div className="input-group">
                   <span className="input-group-text bg-light border-0">

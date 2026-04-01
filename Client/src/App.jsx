@@ -16,6 +16,8 @@ import MedicationHistory from './pages/MedicationHistory.jsx';
 import WellnessTracker from './pages/WellnessTracker.jsx';
 import Reports from './pages/Reports.jsx';
 import Profile from './pages/Profile.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage  from './pages/ResetPasswordPage.jsx';
 
 export const AuthContext = createContext(null);
 
@@ -150,7 +152,9 @@ export default function App() {
               <Routes>
                 <Route path="/"               element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
                 <Route path="/login"          element={<LoginPage />} />
-                <Route path="/register"       element={<RegisterPage />} />
+                <Route path="/register"       element={<RegisterPage />} />                
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password"  element={<ResetPasswordPage  />} />
                 <Route path="/dashboard"      element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/add-medication" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
                 <Route path="/history"        element={<ProtectedRoute><MedicationHistory /></ProtectedRoute>} />

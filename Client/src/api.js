@@ -72,6 +72,25 @@ export const api = {
       });
       return handleResponse(res);
     },
+
+    forgotPassword: async (data) => {
+      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return handleResponse(res);
+    },
+ 
+    resetPassword: async (data) => {
+      const res = await fetch(`${API_BASE}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return handleResponse(res);
+    },
+
         googleLogin: async ({ idToken }) => {
       const res = await fetch(`${API_BASE}/auth/google`, {
         method: 'POST',
