@@ -10,6 +10,18 @@ const { startNotificationScheduler } = require('./controllers/notificationContro
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+const https = require('https');
+const keepAlive = () => {
+  const url = process.env.RENDER_URL;
+  if (url) {
+    https.get(`${url}/health`, (res) => {
+      console.log(`🔔 Keep-alive ping: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error('Keep-alive error:', err.message);
+    });
+  }
+};
+setInterval(keepAlive, 14 * 60 * 1000); 
 // const serviceAccount = require('./serviceAccountKey.json');
 let serviceAccount;
 
