@@ -10,7 +10,7 @@ const { startNotificationScheduler } = require('./controllers/notificationContro
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
-const serviceAccount = require('./serviceAccountKey.json');
+// const serviceAccount = require('./serviceAccountKey.json');
 let serviceAccount;
 
 if (process.env.NODE_ENV === 'production') {
