@@ -257,7 +257,7 @@ const forgotPassword = async (req, res) => {
     res.json({ message: 'If that email exists, a reset link has been sent.' });
 
   } catch (error) {
-    console.error('❌ FORGOT PASSWORD ERROR:', error.message);
+    console.error(' FORGOT PASSWORD ERROR:', error.message);
     res.status(500).json({ error: 'Server error. Please try again.' });
   }
 };
@@ -288,7 +288,6 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpires = null;
     await user.save();
 
-    console.log('✅ Password reset for:', user.email);
     res.json({ message: 'Password reset successfully. You can now log in.' });
 
   } catch (error) {

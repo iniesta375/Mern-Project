@@ -15,14 +15,13 @@ const keepAlive = () => {
   const url = process.env.RENDER_URL;
   if (url) {
     https.get(`${url}/health`, (res) => {
-      console.log(`🔔 Keep-alive ping: ${res.statusCode}`);
+      console.log(`Keep-alive ping: ${res.statusCode}`);
     }).on('error', (err) => {
       console.error('Keep-alive error:', err.message);
     });
   }
 };
 setInterval(keepAlive, 14 * 60 * 1000); 
-// const serviceAccount = require('./serviceAccountKey.json');
 let serviceAccount;
 
 if (process.env.NODE_ENV === 'production') {
@@ -33,16 +32,14 @@ if (process.env.NODE_ENV === 'production') {
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
-console.log('Firebase Admin initialised');
+
 
 app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'https://mern-project-sigma-umber.vercel.app',
+    'https://mern-project-git-master-ajayi-inioluwas-projects.vercel.app',
   ],
   credentials: true,
 }));
